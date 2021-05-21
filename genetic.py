@@ -21,19 +21,24 @@ class Genetic:
                 chromosome.append(str(random_number%3))
             self.population.append(chromosome)
 
+    #Calculate the score of each chromosome
+    def update_scores(self):
+        for chromosome in self.population:
+            self.scores.append(self.game.get_score(chromosome))
+
     #Calculate the averge score of current population 
     def calculate_average_score(self):
-        sum = 0
-        for chromosome in self.population:
-            sum += self.game.get_score(chromosome)
-        average = sum/(len(self.population))
+        self.update_scores()
+        average = sum(self.scores)/(len(self.population))
         self.average_scores.append(average)
         return average
         
-    #Select some chromosome to pass for crossover level  
+    #Select some chromosome to pass for crossover level randomly
+    #and update the population with better chromosome
     def selection(self):
-        pass
-
+        self.population = random.randomchoices(self.population, weights=tuple(self.scores), k=len(self.population))
+        self.update_scores()
+        
     def crossover(self):
         pass
 
