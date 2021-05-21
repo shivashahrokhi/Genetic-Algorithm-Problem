@@ -22,7 +22,7 @@ class Genetic:
             self.population.append(chromosome)
 
     #Calculate the averge score of current population 
-    def calculate_averae_score(self):
+    def calculate_average_score(self):
         sum = 0
         for chromosome in self.population:
             sum += self.game.get_score(chromosome)
@@ -42,18 +42,18 @@ class Genetic:
 
     def GA(self):
 
-        self.initilized_population()
-        last_average_score = self.calculate_averae_score()
+        self.initilize_population()
+        last_average_score = self.calculate_average_score()
         self.selection()
         self.crossover()
         self.mutation()
-        new_average_score = self.calculate_averae_score()
-#####here we need to hanle the situation thet algorithm gets stuck in the local optimums
+        new_average_score = self.calculate_average_score()
+#####here we need to handle the situation thet algorithm gets stuck in the local optimums
         while last_average_score - new_average_score > 0.000000001:
             last_average_score = new_average_score
             self.selection()
             self.crossover()
             self.mutation()
-            new_average_score = self.calculate_averae_score()
+            new_average_score = self.calculate_average_score()
         
         return max(self.scores)
