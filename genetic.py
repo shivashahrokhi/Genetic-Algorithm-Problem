@@ -1,3 +1,5 @@
+import random
+
 class Genetic:
     #Get an object of game to apply genetic algorithm to each levels
     def __init__(self, game):
@@ -10,9 +12,14 @@ class Genetic:
         #A list for saving average score of each population
         self.average_scores = []
 
-    #Generate initilize population randomly
-    def initilized_population(self):
-        pass
+    #Generate initilize population randomly with more chance for zeros in each chromosom
+    def initilize_population(self):
+        for i in range(200):
+            chromosome = ""
+            for j in range(len(self.game.current_level_len)):
+                random_number = random.randint(0,3)
+                chromosome.append(str(random_number%3))
+            self.population.append(chromosome)
 
     #Calculate the averge score of current population 
     def calculate_averae_score(self):
