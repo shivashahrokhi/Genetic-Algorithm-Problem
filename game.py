@@ -29,4 +29,4 @@ class Game:
                 steps += 1
             else:
                 break
-        return steps == self.current_level_len - 1, steps
+        return steps
