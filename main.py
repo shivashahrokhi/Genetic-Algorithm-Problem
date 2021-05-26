@@ -8,7 +8,8 @@ def main():
     genetic = Genetic(game)
     for i in range(len(levels)):
         game.load_next_level()
-        print(genetic.GA())
+        print(genetic.ga())
+
 
 if __name__ == '__main__':
     main()
