@@ -2,9 +2,11 @@ import random
 
 
 class Genetic:
-    # Get an object of game to apply genetic algorithm to each levels
     def __init__(self, game):
-
+        """
+        Initialises this class
+        :param game: An object of game to apply genetic algorithm to each levels
+        """
         self.game = game
         # A list for saving current population at any state of the algorithm
         self.population = []
@@ -12,17 +14,21 @@ class Genetic:
         self.scores = []
         # A list for saving average score of each population
         self.average_scores = []
+        # A parameter determining the population size of
+        self.population_size = 200
 
     # Generate initialise population randomly with more chance for zeros in each chromosome
     def initialise_population(self):
-        for i in range(200):
+        self.population = []
+        for i in range(self.population_size):
             chromosome = ""
             for j in range(self.game.current_level_len):
                 random_number = random.randint(0, 3)
                 chromosome += (str(random_number % 3))
             self.population.append(chromosome)
 
-    def initialize_scores(self):
+    def initialise_scores(self):
+        self.scores = []
         for chromosome in self.population:
             self.scores.append(self.game.get_score(chromosome))
 
@@ -62,14 +68,13 @@ class Genetic:
         for chromosome in self.population:
             random_number = random.randint(0, len(chromosome) - 1)
             if chromosome[random_number] != 0:
-                new_chromosome = chromosome[:random_number - 1] + "0" + chromosome[random_number + 1:]
+                new_chromosome = chromosome[:random_number] + "0" + chromosome[random_number + 1:]
                 self.population.remove(chromosome)
                 self.population.append(new_chromosome)
 
     def ga(self):
-
         self.initialise_population()
-        self.initialize_scores()
+        self.initialise_scores()
         last_average_score = self.calculate_average_score()
         self.selection()
         self.crossover()
@@ -84,5 +89,3 @@ class Genetic:
             self.mutation()
             self.update_scores()
             new_average_score = self.calculate_average_score()
-
-        return max(self.scores)

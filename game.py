@@ -1,18 +1,31 @@
 class Game:
     def __init__(self, levels):
-        # Get a list of strings as levels
-        # Store level length to determine if a sequence of action passes all the steps
-
+        """
+        Initialises this class
+        Gets a list of strings as levels.
+        :param levels: A list of strings as levels
+        """
         self.levels = levels
+        self.level_solutions = []
+        self.max_solutions_rating = []
         self.current_level_index = -1
         self.current_level_len = 0
+
+    def initialise_solutions(self):
+        for i in self.levels:
+            self.level_solutions.append("")
+            self.max_solutions_rating.append(-1)
 
     def load_next_level(self):
         self.current_level_index += 1
         self.current_level_len = len(self.levels[self.current_level_index])
 
-    # Get an action sequence and returns maximum steps that can be passed without lost
     def get_steps(self, actions):
+        """
+        Gets an action sequence and returns maximum steps that can be passed without lost.
+        :param actions: A string representing the sequence of actions taken.
+        :return: An integer denoting the maximum steps.
+        """
         lengths = []
         current_level = self.levels[self.current_level_index]
         start = 0
@@ -23,8 +36,8 @@ class Game:
             end = 1
         while end != self.current_level_len:
             current_step = current_level[end]
-            if current_step == '_' or current_step == 'M' or (current_step == 'G' and (actions[end - 1] == '1' or actions[end - 2] == '1'))\
-                    or (current_step == 'L' and actions[end - 1] == '2'):
+            if current_step == '_' or current_step == 'M' or (current_step == 'G' and (actions[end - 1] == '1' or
+               actions[end - 2] == '1')) or (current_step == 'L' and actions[end - 1] == '2'):
                 end += 1
             else:
                 lengths.append(end - start)
@@ -35,8 +48,13 @@ class Game:
         max_length = max(lengths)
         return max_length, max_length == self.current_level_len
 
-    # Get an action sequence and returns additional ratings
     def get_additional_points(self, actions):
+        """
+        Rates each solution based on the criteria of mushrooms collected, enemies killed
+        and if the agent jumps in the last place
+        :param actions: A string of actions the agent takes
+        :return: A float having the overall points
+        """
         current_level = self.levels[self.current_level_index]
         location = 0
         additional_rating = 0
@@ -55,11 +73,20 @@ class Game:
             additional_rating += 2.25
         return additional_rating
 
-    # It need to change a lot
     def get_score(self, actions):
-        # Get an action sequence and determine the steps taken/score
-        # Return a tuple, the first one indicates if these actions result in victory
-        # and the second one shows the steps taken
+        """
+        Get an action sequence and determine the steps taken/score
+        :param actions: A string denoting the actions the agent takes
+        :return: The score of this action if it was taken as a solution
+        """
         max_steps, level_pass = self.get_steps(actions)
         additional_points = self.get_additional_points(actions)
-        return max_steps + additional_points + (5 if level_pass else 0)
+        overall_score = max_steps + additional_points + (5 if level_pass else 0)
+        if level_pass:
+            if self.max_solutions_rating[self.current_level_index] == -1:
+                self.level_solutions[self.current_level_index] = actions
+                self.max_solutions_rating[self.current_level_index] = overall_score
+            elif self.max_solutions_rating[self.current_level_index] < overall_score:
+                self.level_solutions[self.current_level_index] = actions
+                self.max_solutions_rating[self.current_level_index] = overall_score
+        return overall_score

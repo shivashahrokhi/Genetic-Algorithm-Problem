@@ -8,7 +8,14 @@ def main():
     genetic = Genetic(game)
     for i in range(len(levels)):
         game.load_next_level()
-        print(genetic.ga())
+        game.initialise_solutions()
+        genetic.ga()
+        if game.max_solutions_rating[i] == -1:
+            print("No solution was found for level", i)
+        else:
+            print("Level", i)
+            print("Best solution:", game.level_solutions[i])
+            print("Rating:", game.max_solutions_rating[i])
 
 
 if __name__ == '__main__':
