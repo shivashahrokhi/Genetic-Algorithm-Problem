@@ -17,8 +17,13 @@ class Genetic:
         # A parameter determining the population size of
         self.population_size = 200
 
-    # Generate initialise population randomly with more chance for zeros in each chromosome
+    def initialise_average_scores(self):
+        self.average_scores = []
+
     def initialise_population(self):
+        """
+        Generate the initial population randomly with more chance for zeros in each chromosome
+        """
         self.population = []
         for i in range(self.population_size):
             chromosome = ""
@@ -32,26 +37,35 @@ class Genetic:
         for chromosome in self.population:
             self.scores.append(self.game.get_score(chromosome))
 
-    # Calculate the score of each chromosome
     def update_scores(self):
+        """
+        Calculate the score of each chromosome
+        """
         for i in range(len(self.population)):
             self.scores[i] = self.game.get_score(self.population[i])
 
-    # Calculate the average score of current population
     def calculate_average_score(self):
+        """
+        Calculate the average score of current population
+        :return: A float containing the average score of the current generation
+        """
         average = sum(self.scores) / (len(self.population))
         self.average_scores.append(average)
         return average
 
-    # Select some chromosome to pass for crossover level randomly
-    # and update the population with better chromosome
     def selection(self):
+        """
+        Select some chromosome to pass for crossover level randomly
+        and update the population with better chromosome
+        """
         self.population = random.choices(self.population, weights=tuple(self.scores), k=len(self.population))
         self.update_scores()
 
-    # One point crossover
-    # warning: length of population should be even
     def crossover(self):
+        """
+        Performs one point crossover
+        warning: length of population should be even
+        """
         new_population = []
         while len(self.population) != 0:
             parent_one = self.population.pop(random.randint(0, len(self.population) - 1))
@@ -63,8 +77,10 @@ class Genetic:
             new_population.append(child_two)
         self.population = new_population
 
-    # Change one random gene of each chromosome to zero
     def mutation(self):
+        """
+        Change one random gene of each chromosome to zero
+        """
         for chromosome in self.population:
             random_number = random.randint(0, len(chromosome) - 1)
             if chromosome[random_number] != 0:
@@ -73,6 +89,7 @@ class Genetic:
                 self.population.append(new_chromosome)
 
     def ga(self):
+        self.initialise_average_scores()
         self.initialise_population()
         self.initialise_scores()
         last_average_score = self.calculate_average_score()
@@ -81,7 +98,7 @@ class Genetic:
         self.mutation()
         self.update_scores()
         new_average_score = self.calculate_average_score()
-        # here we need to handle the situation the algorithm gets stuck in the local optimums
+        # Here we need to handle the situation the algorithm gets stuck in the local optimums
         while abs(last_average_score - new_average_score) > 0.0000000000001:
             last_average_score = new_average_score
             self.selection()
@@ -89,3 +106,4 @@ class Genetic:
             self.mutation()
             self.update_scores()
             new_average_score = self.calculate_average_score()
+        return self.average_scores

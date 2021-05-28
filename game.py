@@ -12,7 +12,7 @@ class Game:
         self.current_level_len = 0
 
     def initialise_solutions(self):
-        for i in self.levels:
+        for i in range(len(self.levels)):
             self.level_solutions.append("")
             self.max_solutions_rating.append(-1)
 
