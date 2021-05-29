@@ -30,14 +30,14 @@ class Game:
         current_level = self.levels[self.current_level_index]
         start = 0
         end = 0
-        if current_level[0] != "_":
+        if current_level[0] != "_" and current_level[0] != "M":
             lengths.append(0)
             start = 1
             end = 1
         while end != self.current_level_len:
             current_step = current_level[end]
             if current_step == '_' or current_step == 'M' or (current_step == 'G' and (actions[end - 1] == '1' or
-               actions[end - 2] == '1')) or (current_step == 'L' and actions[end - 1] == '2'):
+                (end > 1 and actions[end - 2] == '1'))) or (current_step == 'L' and actions[end - 1] == '2'):
                 end += 1
             else:
                 lengths.append(end - start)
