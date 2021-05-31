@@ -36,8 +36,13 @@ class Game:
             end = 1
         while end != self.current_level_len:
             current_step = current_level[end]
-            if current_step == '_' or current_step == 'M' or (current_step == 'G' and (actions[end - 1] == '1' or
-                (end > 1 and actions[end - 2] == '1'))) or (current_step == 'L' and actions[end - 1] == '2'):
+            if (actions[end] == '1' or actions[end] == '2') and (end > 0 and actions[end - 1] == '1'):
+                lengths.append(end - start)
+                end += 1
+                start = end
+            elif current_step == '_' or current_step == 'M' or \
+                    (current_step == 'G' and (actions[end - 1] == '1' or (end > 1 and actions[end - 2] == '1'))) or \
+                    (current_step == 'L' and actions[end - 1] == '2' and (end > 1 and actions[end - 2] != '1')):
                 end += 1
             else:
                 lengths.append(end - start)
@@ -81,7 +86,7 @@ class Game:
         """
         max_steps, level_pass = self.get_steps(actions)
         additional_points = self.get_additional_points(actions)
-        overall_score = max_steps + additional_points + (5 if level_pass else 0)
+        overall_score = max_steps + additional_points + (len(actions) / 4 if level_pass else 0)
         if level_pass:
             if self.max_solutions_rating[self.current_level_index] == -1:
                 self.level_solutions[self.current_level_index] = actions

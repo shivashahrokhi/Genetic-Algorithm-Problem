@@ -15,10 +15,7 @@ class Genetic:
         # A list for saving average score of each population
         self.average_scores = []
         # A parameter determining the population size of
-        self.population_size = 500
-
-    def initialise_average_scores(self):
-        self.average_scores = []
+        self.population_size = 200
 
     def initialise_population(self):
         """
@@ -28,11 +25,12 @@ class Genetic:
         for i in range(self.population_size):
             chromosome = ""
             for j in range(self.game.current_level_len):
-                random_number = random.randint(0, 3)
-                chromosome += (str(random_number % 3))
+                random_number = random.randint(0, 3) % 3
+                chromosome += (str(random_number))
             self.population.append(chromosome)
 
     def initialise_scores(self):
+        self.average_scores = []
         self.scores = []
         for chromosome in self.population:
             self.scores.append(self.game.get_score(chromosome))
@@ -82,21 +80,14 @@ class Genetic:
         Change one random gene of each chromosome to zero
         """
         for chromosome in self.population:
-            random_number = random.randint(0, 10 * len(chromosome) - 1)
-            if random_number < len(chromosome):
-                random_char_number = random.randint(0, 3) % 3
-                if random_char_number == 0:
-                    mutation_string = '0'
-                elif random_char_number == 1:
-                    mutation_string = '1'
-                else:
-                    mutation_string = '2'
-                new_chromosome = chromosome[:random_number] + mutation_string + chromosome[random_number + 1:]
-                self.population.remove(chromosome)
-                self.population.append(new_chromosome)
+            random_number = random.randint(0, len(chromosome) - 1)
+            random_char_number = random.randint(0, 3) % 3
+            mutation_string = str(random_char_number)
+            new_chromosome = chromosome[:random_number] + mutation_string + chromosome[random_number + 1:]
+            self.population.remove(chromosome)
+            self.population.append(new_chromosome)
 
     def ga(self):
-        self.initialise_average_scores()
         self.initialise_population()
         self.initialise_scores()
         last_average_score = self.calculate_average_score()
@@ -106,11 +97,13 @@ class Genetic:
         self.update_scores()
         new_average_score = self.calculate_average_score()
         # Here we need to handle the situation the algorithm gets stuck in the local optimums
-        while abs(last_average_score - new_average_score) > 0.0000000001:
+        generation_number = 0
+        while abs(last_average_score - new_average_score) > 0.000001 and generation_number < 3000:
             last_average_score = new_average_score
             self.selection()
             self.crossover()
             self.mutation()
             self.update_scores()
             new_average_score = self.calculate_average_score()
+            generation_number += 1
         return self.average_scores

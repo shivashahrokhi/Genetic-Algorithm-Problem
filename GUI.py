@@ -10,8 +10,8 @@ class Interface:
         self.level = level
         self.solution = solution
         self.modified_level = level
-        self.counter = 0
-        self.item_size = int((400 * 16 / 9) / len(level))
+        self.counter = -1
+        self.item_size = 40
         self.starting_x = int(int(540 * 16 / 9) - int(400 * 16 / 9)) / 2
         self.starting_y = int(270)
         self.font = "Helvetica 16 bold italic"
@@ -66,7 +66,7 @@ class Interface:
         self.FG = ImageTk.PhotoImage(master=self.canvas, image=self.Foreground)
 
         self.arrange_component()
-        self.update_canvas()
+        self.update_gui()
         self.root.mainloop()
 
     def arrange_component(self):
@@ -80,59 +80,76 @@ class Interface:
         self.sl3.pack(padx=0, pady=10, side=tkinter.LEFT)
         self.free_label2.pack(side=tkinter.LEFT)
         self.b.pack(padx=0, pady=10, side=tkinter.LEFT)
-        self.update_canvas()
 
-    def update_canvas(self):
+    def update_canvas(self, part1, part2):
+        # Clearing canvas
         self.canvas.delete("all")
-        for i in range(len(self.level)):
-            self.canvas.create_image(self.starting_x + i * self.item_size,
+
+        # Drawing items on the canvas
+        for i in range(self.counter - part1, self.counter + part2):
+            j = i if self.counter < 11 else i - self.counter + part1
+            self.canvas.create_image(self.starting_x + j * self.item_size,
                                      self.starting_y + self.item_size, image=self.U)
             if self.level[i] == 'L':
-                self.canvas.create_image(self.starting_x + i * self.item_size,
-                                         self.starting_y - self.item_size, image=self.L)
+                self.canvas.create_image(self.starting_x + j * self.item_size,
+                                         self.starting_y - self.item_size + 10, image=self.L)
             elif self.level[i] == 'G':
                 if self.counter >= i > 1 and self.solution[i - 2] == '1':
-                    self.canvas.create_image(self.starting_x + i * self.item_size,
+                    self.canvas.create_image(self.starting_x + j * self.item_size,
                                              self.starting_y, image=self.DG)
                 else:
-                    self.canvas.create_image(self.starting_x + i * self.item_size,
+                    self.canvas.create_image(self.starting_x + j * self.item_size,
                                              self.starting_y, image=self.G)
             elif self.level[i] == 'M':
                 if self.counter < i or i > 0 and self.solution[i - 1] == '1':
-                    self.canvas.create_image(self.starting_x + i * self.item_size,
+                    self.canvas.create_image(self.starting_x + j * self.item_size,
                                              self.starting_y, image=self.MU)
-        self.canvas.create_image(self.starting_x + len(self.level) * self.item_size, self.starting_y, image=self.F)
-        self.canvas.create_image(self.starting_x + len(self.level) * self.item_size, self.starting_y + self.item_size,
-                                 image=self.U)
+
+        # Drawing the flag when necessary
+        if len(self.level) < 20 or part2 < 10:
+            flag_location = 20 if len(self.level) > 20 else len(self.level)
+            self.canvas.create_image(self.starting_x + flag_location * self.item_size, self.starting_y, image=self.F)
+            self.canvas.create_image(self.starting_x + flag_location * self.item_size, self.starting_y + self.item_size,
+                                     image=self.U)
+
+        # Drawing the foreground
         self.canvas.create_image(int(270 * 16 / 9), 450, image=self.FG)
+
+        # Drawing Mario
+        if len(self.level) > 20:
+            mario_location = self.counter if self.counter < 11 else 20 - part2
+        else:
+            mario_location = self.counter if self.counter < 11 else len(self.level) - part2
         if self.counter == len(self.level):
             if self.solution[self.counter - 1] == '1':
-                self.canvas.create_image(self.starting_x + self.counter * self.item_size,
+                self.canvas.create_image(self.starting_x + mario_location * self.item_size,
                                          self.starting_y - self.item_size, image=self.MJ)
             elif self.solution[self.counter - 1] == '2':
-                self.canvas.create_image(self.starting_x + self.counter * self.item_size,
-                                         self.starting_y, image=self.MC)
+                self.canvas.create_image(self.starting_x + mario_location * self.item_size,
+                                         self.starting_y + 5, image=self.MC)
             else:
-                self.canvas.create_image(self.starting_x + self.counter * self.item_size,
+                self.canvas.create_image(self.starting_x + mario_location * self.item_size,
                                          self.starting_y, image=self.M)
             self.b["state"] = "disabled"
-
         elif self.counter > 0 and self.solution[self.counter - 1] == '1':
-            self.canvas.create_image(self.starting_x + self.counter * self.item_size,
+            self.canvas.create_image(self.starting_x + mario_location * self.item_size,
                                      self.starting_y - self.item_size, image=self.MJ)
         elif self.counter > 0 and self.solution[self.counter - 1] == '2':
-            self.canvas.create_image(self.starting_x + self.counter * self.item_size,
-                                     self.starting_y, image=self.MC)
+            self.canvas.create_image(self.starting_x + mario_location * self.item_size,
+                                     self.starting_y + 5, image=self.MC)
         else:
-            self.canvas.create_image(self.starting_x + self.counter * self.item_size,
+            self.canvas.create_image(self.starting_x + mario_location * self.item_size,
                                      self.starting_y, image=self.M)
 
     def update_gui(self):
         self.counter += 1
-        self.el1['text'] = self.level[:self.counter]
+        part2 = min(len(self.level) - self.counter, 20 - self.counter) if self.counter < 11 else \
+            min(len(self.level) - self.counter, 10)
+        part1 = 20 - part2 if len(self.level) > 20 else len(self.level) - part2
+        self.el1['text'] = self.level[self.counter - part1: self.counter]
         self.el2['text'] = self.level[self.counter] if self.counter < len(self.level) else ""
-        self.el3['text'] = self.level[(self.counter + 1):]
-        self.sl1['text'] = self.solution[:self.counter]
+        self.el3['text'] = self.level[self.counter + 1: self.counter + part2]
+        self.sl1['text'] = self.solution[self.counter - part1: self.counter]
         self.sl2['text'] = self.solution[self.counter] if self.counter < len(self.level) else ""
-        self.sl3['text'] = self.solution[(self.counter + 1):]
-        self.update_canvas()
+        self.sl3['text'] = self.solution[self.counter + 1: self.counter + part2]
+        self.update_canvas(part1, part2)

@@ -20,13 +20,12 @@ def main():
         plotter.plot(average_scores)
         plotter.show()
         if game.max_solutions_rating[i] == -1:
-            print("No solution was found for level " + str(i))
+            print("No solution was found for level " + str(i + 1))
         else:
-            print("Level " + str(i))
             solution = game.level_solutions[i]
             print("Best solution: " + game.level_solutions[i])
             print("Rating: " + str(game.max_solutions_rating[i]))
-            g = Interface(levels[i], solution)
+            Interface(levels[i], solution)
 
 
 if __name__ == '__main__':
